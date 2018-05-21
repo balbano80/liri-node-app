@@ -15,62 +15,62 @@ var command = process.argv[2];
 var userInput = "";
 
 if (command === undefined){
-inquirer
-    .prompt([
-        { type: "list",
-          name: "choice",
-          message: "Which option would you like to try?",
-          choices: ["Check tweets on a subject", "Get Spotify information on a song title", 
-          "Check OMDB based on a movie title", "Surprise Me"],
-        }
-    ]).then(function(userResponse){
-        console.log(userResponse);
-        choice = userResponse.choice;
-        if (userResponse.choice === "Check tweets on a subject"){
-            inquirer
-                .prompt([
-                    { type: "input",
-                      name: "tweetTopic",
-                      message: "Please type in the topic of tweets your would like to search for: ",                   
-                    }
-                ]).then(function(userTopic){
-                    getTweets(userTopic.tweetTopic);
-                })
-        }
-        else if (userResponse.choice === "Get Spotify information on a song title"){
-            inquirer
-                .prompt([
-                    { type: "input",
-                      name: "songTitle",
-                      message: "Which song title would you like to search through Spotify?",                   
-                    }
-                ]).then(function(userTopic){
-                    getSpotify(userTopic.songTitle);
-                })
-        }
-        else if (userResponse.choice === "Check OMDB based on a movie title"){
-            inquirer
-                .prompt([
-                    { type: "input",
-                      name: "movieTitle",
-                      message: "Which movie title would you like to search through OMDB?",                   
-                    }
-                ]).then(function(userTopic){
-                    getMovie(userTopic.movieTitle);
-                })
-        }
-        else{
-            doThis();
-        }
-    })
-}
+    inquirer
+        .prompt([
+            { type: "list",
+            name: "choice",
+            message: "Which option would you like to try?",
+            choices: ["Check tweets on a subject", "Get Spotify information on a song title", 
+            "Check OMDB based on a movie title", "Surprise Me"],
+            }
+        ]).then(function(userResponse){
+            // console.log(userResponse);
+            choice = userResponse.choice;
+            if (userResponse.choice === "Check tweets on a subject"){
+                inquirer
+                    .prompt([
+                        { type: "input",
+                        name: "tweetTopic",
+                        message: "Please type in the topic of tweets your would like to search for: ",                   
+                        }
+                    ]).then(function(userTopic){
+                        getTweets(userTopic.tweetTopic);
+                    })
+            } // if tweets option chosen, run tweets function on user input
+            else if (userResponse.choice === "Get Spotify information on a song title"){
+                inquirer
+                    .prompt([
+                        { type: "input",
+                        name: "songTitle",
+                        message: "Which song title would you like to search through Spotify?",                   
+                        }
+                    ]).then(function(userTopic){
+                        getSpotify(userTopic.songTitle);
+                    })
+            } // else if spotify option chosen, run spotify function on user input
+            else if (userResponse.choice === "Check OMDB based on a movie title"){
+                inquirer
+                    .prompt([
+                        { type: "input",
+                        name: "movieTitle",
+                        message: "Which movie title would you like to search through OMDB?",                   
+                        }
+                    ]).then(function(userTopic){
+                        getMovie(userTopic.movieTitle);
+                    })
+            } // else if movie option chosen, run OMDB funtion on user input
+            else{
+                doThis();
+            } // else, run doThis function
+        })
+} // if no arguments are passed through command line by user, run inquirer package to gather information
 
 else{
     if (process.argv[3] !== undefined){
         for (var i = 3; i < process.argv.length; i++){
             userInput += process.argv[i] + " ";
-        }
-    };
+        };
+    }; // if second + argument(s) passed, combine into a single string
     // console.log("UserInput: " + userInput);
     switch(command){
         case "my-tweets":
@@ -93,10 +93,10 @@ else{
             break;
 
         case "do-what-it-says":
-            doThis()
+            doThis();
             break;
     }
-}
+} // else, run functions based on argument(s) passed by user
 function getTweets(topic){
     client.get("search/tweets", 
     {
@@ -105,7 +105,7 @@ function getTweets(topic){
     }, function(error, tweets, responses){
         if (error){
             console.log(error);
-        }
+        };
         dataLog(JSON.stringify(tweets));
         console.log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +");
         console.log("        ### Tweets ###");
@@ -120,19 +120,23 @@ function getSpotify(song){
     spotify.search({
         type: "track",
         query: song,
-        limit: 1
+        limit: 5
     }, function(err, data){
         if (err){
             return console.log("Error ocurred " + err);
+        };
+        dataLog(JSON.stringify(data.tracks.items));
+        console.log(JSON.stringify(data.tracks.items));
+        for (var i = 0; i < 5; i++){
+            console.log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +");
+            console.log("Artist: " + data.tracks.items[i].artists[0].name);
+            console.log("Track name: " + data.tracks.items[i].name);
+            console.log("Preview link: " + data.tracks.items[i].preview_url);
+            console.log("Album name: " + data.tracks.items[i].album.name);
+            console.log("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         }
-        dataLog(JSON.stringify(data.tracks.items[0]));
-        console.log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +");
-        console.log("Artist: " + data.tracks.items[0].artists[0].name);
-        console.log("Track name: " + data.tracks.items[0].name);
-        console.log("Preview link: " + data.tracks.items[0].preview_url);
-        console.log("Album name: " + data.tracks.items[0].album.name);
-        console.log("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         console.log("");
+        // TODO set up loop to go through return object and list data for each
     });
 
 }//reach out to spotify and grab userInput song information
@@ -155,7 +159,7 @@ function getMovie(movie){
             console.log("");
         }
         else{
-            console.log("Error Status Code: " + response.statusCode)
+            console.log("Error Status Code: " + response.statusCode);
             console.log("Error: " + error);
         }
     });
@@ -166,10 +170,10 @@ function doThis(){
         if (error){
             console.log(error);
         }
-        data = data.replace(/\n|\r/g, "");
+        data = data.replace(/\n|\r/g, "");          // removing end-line portion of string and replacing with empty
         // console.log(data);
-        var dataArr = data.split(",");
-        // console.log(dataArr);
+        var dataArr = data.split(",");              // splitting array on comma
+        console.log(dataArr);
         for (var i = 0; i < dataArr.length; i+=2){
             switch(dataArr[i]){
                 case "spotify-this-song":
@@ -183,10 +187,10 @@ function doThis(){
                     break;
                 case "do-what-it-says":
                 break;
-            }
-        }
+            };
+        }; // looping through array and using even indices to determine function to run, and odds as look up topics(if applicable)
     })
-}
+};
 
 function dataLog(data){
     fs.appendFile("log.txt", ("\n" + "\n" + data), function(err){
